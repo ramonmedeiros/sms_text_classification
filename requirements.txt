@@ -1,6 +1,7 @@
 absl-py==0.10.0
 astunparse==1.6.3
 attrs==20.3.0
+backcall==0.2.0
 bleach==3.3.0
 cachetools==4.2.1
 certifi==2020.12.5
@@ -9,6 +10,7 @@ chardet==4.0.0
 colorama==0.4.4
 cryptography==3.4.6
 cycler==0.10.0
+decorator==4.4.2
 dill==0.3.3
 docutils==0.16
 flatbuffers==1.12
@@ -23,6 +25,10 @@ h5py==2.10.0
 idna==2.10
 importlib-metadata==3.4.0
 importlib-resources==5.1.0
+ipdb==0.13.4
+ipython==7.21.0
+ipython-genutils==0.2.0
+jedi==0.18.0
 jeepney==0.6.0
 Keras-Preprocessing==1.1.2
 keyring==22.3.0
@@ -35,10 +41,15 @@ oauthlib==3.1.0
 opt-einsum==3.3.0
 packaging==20.9
 pandas==1.2.2
+parso==0.8.1
+pexpect==4.8.0
+pickleshare==0.7.5
 Pillow==8.1.0
 pkginfo==1.7.0
 promise==2.3
+prompt-toolkit==3.0.16
 protobuf==3.15.1
+ptyprocess==0.7.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
@@ -66,11 +77,13 @@ tensorflow-metadata==0.27.0
 tensorflow-text==2.4.3
 termcolor==1.1.0
 tqdm==4.57.0
+traitlets==5.0.5
 twine==3.3.0
 typing==3.7.4.3
 typing-extensions==3.7.4.3
 urllib3==1.26.3
 ushlex==0.99.1
+wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==0.57.0
 Werkzeug==1.0.1
