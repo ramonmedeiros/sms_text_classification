@@ -13,18 +13,19 @@ test_file_path = "valid-data.tsv"
 
 BUFFER_SIZE = 10000
 BATCH_SIZE = 64
-VOCAB_SIZE=1000
+VOCAB_SIZE = 1000
 
 # read data and set titles
 train_dataset = pd.read_csv(train_file_path, sep='\t', names=['label', 'text'])
 test_dataset = pd.read_csv(test_file_path, sep='\t', names=['label', 'text'])
 
 # map ham spam
-train_dataset['label'] = train_dataset['label'].map({"ham": False, 'spam': True})
-test_dataset['label'] = test_dataset['label'].map({"ham": False, 'spam': True})
+train_dataset['label'] = train_dataset['label'].map({"ham": 1.0, 'spam': 0.0})
+test_dataset['label'] = test_dataset['label'].map({"ham": 1.0, 'spam': 0.0})
 
-X = np.asarray(train_dataset['label']).astype(np.float32)
-X = np.asarray(test_dataset['label']).astype(np.float32)
+import ipdb;ipdb.set_trace()
+train_dataset['label'] = np.asarray(train_dataset['label']).astype(np.float32)
+test_dataset['label'] = np.asarray(test_dataset['label']).astype(np.float32)
 
 # tokenize text and generate dataset
 train_dataset = tf.data.Dataset.from_tensor_slices(train_dataset)
