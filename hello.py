@@ -19,18 +19,17 @@ VOCAB_SIZE = 1000
 train_dataset = pd.read_csv(train_file_path, sep='\t', names=['label', 'text'])
 test_dataset = pd.read_csv(test_file_path, sep='\t', names=['label', 'text'])
 
-# map ham spam
+# map ham spam and covert values to float
 train_dataset['label'] = train_dataset['label'].map({"ham": 1.0, 'spam': 0.0})
 test_dataset['label'] = test_dataset['label'].map({"ham": 1.0, 'spam': 0.0})
-
-import ipdb;ipdb.set_trace()
 train_dataset['label'] = np.asarray(train_dataset['label']).astype(np.float32)
 test_dataset['label'] = np.asarray(test_dataset['label']).astype(np.float32)
 
-# tokenize text and generate dataset
-train_dataset = tf.data.Dataset.from_tensor_slices(train_dataset)
-test_dataset = tf.data.Dataset.from_tensor_slices(test_dataset)
+# create dataset
+train_dataset = tf.data.Dataset.from_tensor_slices((train_dataset['text'], train_dataset['label']))
+test_dataset = tf.data.Dataset.from_tensor_slices((test_dataset['text'], test_dataset['label']))
 
+# examine data
 for text, label in train_dataset.take(1):
   print('texts: ', text.numpy())
   print('label: ', label.numpy())
@@ -38,34 +37,66 @@ for text, label in train_dataset.take(1):
 train_dataset = train_dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 
-import ipdb;ipdb.set_trace()
-train_dataset.element_spec
-
-for text in train_dataset.take(1):
+# examine data
+for text, label in train_dataset.take(1):
   print('texts: ', text.numpy()[:3])
-
+  print('label: ', label.numpy()[:3])
 
 encoder = tf.keras.layers.experimental.preprocessing.TextVectorization(
     max_tokens=VOCAB_SIZE)
+
+
 encoder.adapt(train_dataset.map(lambda text, label: text))
-
 vocab = np.array(encoder.get_vocabulary())
-vocab[:20]
+print(vocab[:20])
 
+model = tf.keras.Sequential([
+    encoder,
+    tf.keras.layers.Embedding(
+        input_dim=len(encoder.get_vocabulary()),
+        output_dim=64,
+        # Use masking to handle the variable sequence lengths
+        mask_zero=True),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(1)
+])
+
+assert [layer.supports_masking for layer in model.layers] == [False, True, True, True, True]
+
+model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              optimizer=tf.keras.optimizers.Adam(1e-4),
+              metrics=['accuracy'])
+
+history = model.fit(train_dataset, epochs=10, validation_data=test_dataset, validation_steps=30)
+
+test_loss, test_acc = model.evaluate(test_dataset)
+
+print('Test Loss: {}'.format(test_loss))
+print('Test Accuracy: {}'.format(test_acc))
 
 # function to predict messages based on model
 # (should return list containing prediction and label, ex. [0.008318834938108921, 'ham'])
 def predict_message(pred_text):
+  predictions = model.predict(np.array([pred_text]))[0]
 
+  if round(predictions) == 1:
+      return "ham"
+  return "spam"
 
-
-  return (prediction)
-
-pred_text = "how are you doing today?"
+pred_text = "you have won £1000 cash! call to claim your prize."
 
 prediction = predict_message(pred_text)
 print(prediction)
 
+
+plt.figure(figsize=(16,8))
+plt.subplot(1,2,1)
+plot_graphs(history, 'accuracy')
+plt.ylim(None,1)
+plt.subplot(1,2,2)
+plot_graphs(history, 'loss')
+plt.ylim(0,None)
 
 # Run this cell to test your function and model. Do not modify contents.
 def test_predictions():
