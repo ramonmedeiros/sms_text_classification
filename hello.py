@@ -15,6 +15,13 @@ BUFFER_SIZE = 10000
 BATCH_SIZE = 64
 VOCAB_SIZE = 1000
 
+def plot_graphs(history, metric):
+  plt.plot(history.history[metric])
+  plt.plot(history.history['val_'+metric], '')
+  plt.xlabel("Epochs")
+  plt.ylabel(metric)
+  plt.legend([metric, 'val_'+metric])
+
 # read data and set titles
 train_dataset = pd.read_csv(train_file_path, sep='\t', names=['label', 'text'])
 test_dataset = pd.read_csv(test_file_path, sep='\t', names=['label', 'text'])
@@ -75,21 +82,6 @@ test_loss, test_acc = model.evaluate(test_dataset)
 print('Test Loss: {}'.format(test_loss))
 print('Test Accuracy: {}'.format(test_acc))
 
-# function to predict messages based on model
-# (should return list containing prediction and label, ex. [0.008318834938108921, 'ham'])
-def predict_message(pred_text):
-  predictions = model.predict(np.array([pred_text]))[0]
-
-  if round(predictions) == 1:
-      return "ham"
-  return "spam"
-
-pred_text = "you have won £1000 cash! call to claim your prize."
-
-prediction = predict_message(pred_text)
-print(prediction)
-
-
 plt.figure(figsize=(16,8))
 plt.subplot(1,2,1)
 plot_graphs(history, 'accuracy')
@@ -97,6 +89,17 @@ plt.ylim(None,1)
 plt.subplot(1,2,2)
 plot_graphs(history, 'loss')
 plt.ylim(0,None)
+plt.show()
+
+# function to predict messages based on model
+# (should return list containing prediction and label, ex. [0.008318834938108921, 'ham'])
+def predict_message(pred_text):
+    predictions = model.predict(np.array([pred_text]))[0][0]
+
+    if round(predictions) >= 1:
+        return [predictions, "ham"]
+    return [predictions, "spam"]
+
 
 # Run this cell to test your function and model. Do not modify contents.
 def test_predictions():
