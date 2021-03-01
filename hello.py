@@ -37,25 +37,24 @@ train_dataset = tf.data.Dataset.from_tensor_slices((train_dataset['text'], train
 test_dataset = tf.data.Dataset.from_tensor_slices((test_dataset['text'], test_dataset['label']))
 
 # examine data
-for text, label in train_dataset.take(1):
-  print('texts: ', text.numpy())
-  print('label: ', label.numpy())
+#for text, label in train_dataset.take(1):
+#  print('texts: ', text.numpy())
+#  print('label: ', label.numpy())
 
 train_dataset = train_dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 
 # examine data
-for text, label in train_dataset.take(1):
-  print('texts: ', text.numpy()[:3])
-  print('label: ', label.numpy()[:3])
+#for text, label in train_dataset.take(1):
+#  print('texts: ', text.numpy()[:3])
+#  print('label: ', label.numpy()[:3])
 
 encoder = tf.keras.layers.experimental.preprocessing.TextVectorization(
     max_tokens=VOCAB_SIZE)
 
-
 encoder.adapt(train_dataset.map(lambda text, label: text))
 vocab = np.array(encoder.get_vocabulary())
-print(vocab[:20])
+#print(vocab[:20])
 
 model = tf.keras.Sequential([
     encoder,
@@ -79,6 +78,9 @@ history = model.fit(train_dataset, epochs=10, validation_data=test_dataset, vali
 
 test_loss, test_acc = model.evaluate(test_dataset)
 
+# save model
+model.save('saved_model/model.tf', save_format='tf')
+
 print('Test Loss: {}'.format(test_loss))
 print('Test Accuracy: {}'.format(test_acc))
 
@@ -89,7 +91,7 @@ plt.ylim(None,1)
 plt.subplot(1,2,2)
 plot_graphs(history, 'loss')
 plt.ylim(0,None)
-plt.show()
+#plt.show()
 
 # function to predict messages based on model
 # (should return list containing prediction and label, ex. [0.008318834938108921, 'ham'])
