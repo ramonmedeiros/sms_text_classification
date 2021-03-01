@@ -2,11 +2,7 @@ import tensorflow as tf
 import pandas as pd
 from tensorflow import keras
 
-import tensorflow_datasets as tfds
-import tensorflow_text as text
-
 import numpy as np
-import matplotlib.pyplot as plt
 
 train_file_path = "train-data.tsv"
 test_file_path = "valid-data.tsv"
@@ -14,13 +10,6 @@ test_file_path = "valid-data.tsv"
 BUFFER_SIZE = 10000
 BATCH_SIZE = 64
 VOCAB_SIZE = 1000
-
-def plot_graphs(history, metric):
-  plt.plot(history.history[metric])
-  plt.plot(history.history['val_'+metric], '')
-  plt.xlabel("Epochs")
-  plt.ylabel(metric)
-  plt.legend([metric, 'val_'+metric])
 
 # read data and set titles
 train_dataset = pd.read_csv(train_file_path, sep='\t', names=['label', 'text'])
@@ -79,19 +68,10 @@ history = model.fit(train_dataset, epochs=10, validation_data=test_dataset, vali
 test_loss, test_acc = model.evaluate(test_dataset)
 
 # save model
-model.save('saved_model/model.tf', save_format='tf')
+model.save('model')
 
 print('Test Loss: {}'.format(test_loss))
 print('Test Accuracy: {}'.format(test_acc))
-
-plt.figure(figsize=(16,8))
-plt.subplot(1,2,1)
-plot_graphs(history, 'accuracy')
-plt.ylim(None,1)
-plt.subplot(1,2,2)
-plot_graphs(history, 'loss')
-plt.ylim(0,None)
-#plt.show()
 
 # function to predict messages based on model
 # (should return list containing prediction and label, ex. [0.008318834938108921, 'ham'])
